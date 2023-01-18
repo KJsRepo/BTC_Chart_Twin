@@ -116,11 +116,11 @@ def save_graph_to_png(graph, file_name):
 def nostrBuildUpload(file_path, server_url):
     try:
         with open(file_path, 'rb') as f:
-            data = {'submit': 'Upload'}
+            formdata = {'submit': 'Upload'}
             files = {'fileToUpload': f}
-            response = requests.post(server_url, data=data, files=files)
+            response = requests.post(server_url, data=formdata, files=files)
             response.raise_for_status()
-            match = re.search('<input.*value="(.+?)".*id="myInput"', response.text)
+            match = re.search(r'<span class=mono id="theList" style="color:#800080">(.+?)\s', response.text)
             if match:
                 return match.group(1)
             else:
@@ -128,10 +128,7 @@ def nostrBuildUpload(file_path, server_url):
     except requests.exceptions.HTTPError as err:
         print(err)
 
-pullMode = True
-testMode = True
-
-if pullMode:
+if input('Do you want to download new data? (y/n)').lower() == 'y':
     # DOWNLOAD THE FILE
     url = "https://www.cryptodatadownload.com/cdd/Gemini_BTCUSD_1h.csv"
     response = requests.get(url)
@@ -143,7 +140,7 @@ if pullMode:
     os.remove("temp.csv")
 
 # Select which day if you don't like one, 1-10
-useDay = 2
+useDay = 0
 
 # READ THE DATA AND PROCESS IT
 data = read_csv("histdata.csv")
@@ -154,17 +151,16 @@ closest_days = find_closest_matching_days(data, last_complete_day)
 graph = graph_price_days(closest_days[useDay]['priceDay'], last_complete_day)
 save_graph_to_png(graph, last_complete_day.date.replace('-','_') + '.png')
 
-if not testMode:
+if input('A match has been found. Generated: ' + last_complete_day.date.replace('-','_') + '.png' + '        Upload? (y/n)').lower() == 'y':
     imageUrl = nostrBuildUpload(last_complete_day.date.replace('-','_') + '.png', 'http://nostr.build/upload.php')
 else:
     imageUrl = 'ImageURLPlaceholder'
 
-#  TODO: GET BITCOIN PRICE!!!!
-
+todayPrice = float(input("What is the price of bitcoin? "))
 
 date_object = datetime.strptime(closest_days[useDay]['priceDay'].date, "%Y-%m-%d")
 formatted_date = date_object.strftime("%B %d, %Y")
-multiplier = str(round(21000/closest_days[useDay]['priceDay'].data['23']['close'], 1)).replace(".0", "")
+multiplier = str(round(todayPrice/closest_days[useDay]['priceDay'].data['23']['close'], 1)).replace(".0", "")
 
 print('--------------------------------------------')
 print("Yesterday's BTC Chart Twin was " + formatted_date + "\n\n"
@@ -172,5 +168,4 @@ print("Yesterday's BTC Chart Twin was " + formatted_date + "\n\n"
     + " and closed at $" + str(closest_days[useDay]['priceDay'].data['23']['close']) 
     + ".  It is now worth " + multiplier + "x that.\n\n"
     + imageUrl)
-
 print('--------------------------------------------')
