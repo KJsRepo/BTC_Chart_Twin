@@ -158,14 +158,37 @@ else:
 
 todayPrice = float(input("What is the price of bitcoin? "))
 
-date_object = datetime.strptime(closest_days[useDay]['priceDay'].date, "%Y-%m-%d")
-formatted_date = date_object.strftime("%B %d, %Y")
 multiplier = str(round(todayPrice/closest_days[useDay]['priceDay'].data['23']['close'], 1)).replace(".0", "")
 
+def get_percent(a, b):
+    tmp = abs((a - b) / b * 100)
+    if tmp > 50:
+        tmp = str(round(tmp))
+    else:
+        tmp = str(round(tmp, 1)).replace('.0', '')
+    return tmp
+
+if closest_days[useDay]['priceDay'].data['00']['close'] < closest_days[useDay]['priceDay'].data['23']['close']:
+    shorttermVerb = ' gaining ' + get_percent(closest_days[useDay]['priceDay'].data['00']['close'], closest_days[useDay]['priceDay'].data['23']['close']) + '% for the day'
+elif closest_days[useDay]['priceDay'].data['00']['close'] > closest_days[useDay]['priceDay'].data['23']['close']:
+    shorttermVerb = ' losing ' + get_percent(closest_days[useDay]['priceDay'].data['00']['close'], closest_days[useDay]['priceDay'].data['23']['close']) + '% for the day'
+else:
+    shorttermVerb = ' closing at the same price.'
+
+if todayPrice > closest_days[useDay]['priceDay'].data['23']['close']:
+    longtermVerb = ' increased in value by ' + get_percent(todayPrice, closest_days[useDay]['priceDay'].data['23']['close']) + '%'
+elif todayPrice < closest_days[useDay]['priceDay'].data['23']['close']:
+    longtermVerb = ' decreased in value by ' + get_percent(todayPrice, closest_days[useDay]['priceDay'].data['23']['close']) + '%'
+else:
+    longtermVerb = ' remained the same price.'
+
+date_object = datetime.strptime(closest_days[useDay]['priceDay'].date, "%Y-%m-%d")
+formatted_date = date_object.strftime("%B %d, %Y")
 print('--------------------------------------------')
 print("Yesterday's BTC Chart Twin was " + formatted_date + "\n\n"
     + "On that day, BTC opened at $" + str(closest_days[useDay]['priceDay'].data['00']['close']) 
-    + " and closed at $" + str(closest_days[useDay]['priceDay'].data['23']['close']) 
-    + ".  It is now worth " + multiplier + "x that.\n\n"
+    + " and closed at $" + str(closest_days[useDay]['priceDay'].data['23']['close']) + ","
+    + shorttermVerb + ".\n\n"
+    + "It has since" + longtermVerb + ".\n\n"
     + imageUrl)
 print('--------------------------------------------')
