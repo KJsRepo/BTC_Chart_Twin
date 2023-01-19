@@ -169,9 +169,9 @@ def get_percent(a, b):
     return tmp
 
 if closest_days[useDay]['priceDay'].data['00']['close'] < closest_days[useDay]['priceDay'].data['23']['close']:
-    shorttermVerb = ' gaining ' + get_percent(closest_days[useDay]['priceDay'].data['00']['close'], closest_days[useDay]['priceDay'].data['23']['close']) + '% for the day'
+    shorttermVerb = ' gaining ' + get_percent(closest_days[useDay]['priceDay'].data['00']['close'], closest_days[useDay]['priceDay'].data['23']['close']) + '%'
 elif closest_days[useDay]['priceDay'].data['00']['close'] > closest_days[useDay]['priceDay'].data['23']['close']:
-    shorttermVerb = ' losing ' + get_percent(closest_days[useDay]['priceDay'].data['00']['close'], closest_days[useDay]['priceDay'].data['23']['close']) + '% for the day'
+    shorttermVerb = ' losing ' + get_percent(closest_days[useDay]['priceDay'].data['00']['close'], closest_days[useDay]['priceDay'].data['23']['close']) + '%'
 else:
     shorttermVerb = ' closing at the same price.'
 
